@@ -50,7 +50,7 @@
 ---
 
 ## 🚀 怎么玩？
--点击[这里](https://womderboy.github.io/tetris/)就可以体验啦！
+- 点击[这里](https://womderboy.github.io/tetris/)就可以体验啦！
 
 ---
 
