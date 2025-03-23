@@ -1,0 +1,210 @@
+body {
+  background: #222;
+  color: #fff;
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  height: 100vh;
+  justify-content: center;
+}
+.game-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.7));
+}
+#tetris-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+#tetris-container::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+}
+#preview-area {
+  width: 200px;
+  height: 80px;
+  display: grid;
+  grid-template-columns: repeat(10, 20px);
+  grid-template-rows: repeat(4, 20px);
+  background: rgba(0, 0, 0, 0.3);
+  border-left: 2px solid #fff;
+  border-right: 2px solid #fff;
+  border-top: 2px solid #fff;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-bottom: -1px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(2px);
+}
+#preview-area::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 25px;
+  background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.7));
+  pointer-events: none;
+  z-index: 5;
+}
+#preview-area .cell {
+  border-color: transparent;
+}
+#preview-area .filled {
+  opacity: 0.8;
+  transform: scale(0.9);
+}
+#tetris {
+  border: 2px solid #fff;
+  width: 200px;
+  height: 400px;
+  display: grid;
+  grid-template-columns: repeat(10, 20px);
+  grid-template-rows: repeat(20, 20px);
+  background: #000;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+.cell {
+  border: 1px solid #333;
+  width: 20px;
+  height: 20px;
+  box-sizing: border-box;
+}
+.filled {
+  background: cyan;
+  transition: all 0.1s ease;
+}
+/* 添加不同形状方块的颜色 */
+.l-piece {
+  background: #FF8E0D;  /* 橙色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.j-piece {
+  background: #0D47FF;  /* 蓝色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.z-piece {
+  background: #FF0D72;  /* 红色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.s-piece {
+  background: #72FF0D;  /* 绿色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.t-piece {
+  background: #9B0DFF;  /* 紫色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.o-piece {
+  background: #FFD800;  /* 黄色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+.i-piece {
+  background: #0DFFDD;  /* 青色 */
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
+}
+/* 添加幽灵方块样式 */
+.ghost {
+  opacity: 0.3;
+}
+.ghost.l-piece {
+  background: #FF8E0D;
+}
+.ghost.j-piece {
+  background: #0D47FF;
+}
+.ghost.z-piece {
+  background: #FF0D72;
+}
+.ghost.s-piece {
+  background: #72FF0D;
+}
+.ghost.t-piece {
+  background: #9B0DFF;
+}
+.ghost.o-piece {
+  background: #FFD800;
+}
+.ghost.i-piece {
+  background: #0DFFDD;
+}
+.game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+}
+#score {
+  font-size: 24px;
+  text-align: center;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+#next-piece {
+  border: 2px solid #fff;
+  width: 100px;
+  height: 100px;
+  display: grid;
+  grid-template-columns: repeat(5, 20px);
+  grid-template-rows: repeat(5, 20px);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+}
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #4CAF50;
+  color: white;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #45a049;
+}
+button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+.instructions {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  max-width: 300px;
+}
+.paused {
+  position: relative;
+}
+.paused::after {
+  content: "已暂停";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 10px 20px;
+  border-radius: 5px;
+} 
