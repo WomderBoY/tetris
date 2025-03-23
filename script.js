@@ -5,6 +5,13 @@ const nextPieceDisplay = document.getElementById('next-piece');
 const startBtn = document.getElementById('start-btn');
 const pauseBtn = document.getElementById('pause-btn');
 const restartBtn = document.getElementById('restart-btn');
+// 移动端控制按钮
+const leftBtn = document.getElementById('left-btn');
+const rightBtn = document.getElementById('right-btn');
+const downBtn = document.getElementById('down-btn');
+const rotateBtn = document.getElementById('rotate-btn');
+const dropBtn = document.getElementById('drop-btn');
+
 const width = 10;
 const height = 20;
 const previewHeight = 4;
@@ -16,6 +23,15 @@ let timerId = null;
 let isGameOver = false;
 let isPaused = false;
 let nextRandom = 0;
+let isMobileDevice = false;
+
+// 检测是否为移动设备
+function checkMobileDevice() {
+  return (window.innerWidth <= 768) || 
+         ('ontouchstart' in window) || 
+         (navigator.maxTouchPoints > 0) || 
+         (navigator.msMaxTouchPoints > 0);
+}
 
 // 初始化游戏格子
 for (let i = 0; i < width * height; i++) {
@@ -463,7 +479,7 @@ function gameOver() {
   alert("游戏结束！最终得分：" + score);
 }
 
-// 修改键盘控制
+// 键盘控制
 function control(e) {
   if (timerId && !isPaused) {
     if(e.keyCode === 37) {
@@ -488,11 +504,123 @@ function hardDrop() {
   freeze();
 }
 
+// 设置移动端虚拟按键
+function setupMobileControls() {
+  // 左按钮
+  leftBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveLeft();
+    }
+  });
+  
+  // 加入长按持续移动
+  let leftInterval;
+  leftBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveLeft();
+      leftInterval = setInterval(moveLeft, 150);
+    }
+  });
+  leftBtn.addEventListener('touchend', function() {
+    clearInterval(leftInterval);
+  });
+  
+  // 右按钮
+  rightBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveRight();
+    }
+  });
+  
+  // 加入长按持续移动
+  let rightInterval;
+  rightBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveRight();
+      rightInterval = setInterval(moveRight, 150);
+    }
+  });
+  rightBtn.addEventListener('touchend', function() {
+    clearInterval(rightInterval);
+  });
+  
+  // 下按钮
+  downBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveDown();
+    }
+  });
+  
+  // 加入长按持续下移
+  let downInterval;
+  downBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      moveDown();
+      downInterval = setInterval(moveDown, 100);
+    }
+  });
+  downBtn.addEventListener('touchend', function() {
+    clearInterval(downInterval);
+  });
+  
+  // 旋转按钮
+  rotateBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      rotate();
+    }
+  });
+  
+  // 直接落下按钮
+  dropBtn.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    if (timerId && !isPaused) {
+      hardDrop();
+    }
+  });
+  
+  // 防止触摸时页面滚动
+  document.addEventListener('touchmove', function(e) {
+    if (e.target.classList.contains('control-btn')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+}
+
+// 调整游戏速度根据设备类型
+function adjustGameSpeed() {
+  let gameSpeed = isMobileDevice ? 600 : 500;  // 移动设备上稍慢一些
+  if (timerId) {
+    clearInterval(timerId);
+    timerId = setInterval(moveDown, gameSpeed);
+  }
+  return gameSpeed;
+}
+
+// 响应窗口大小变化
+function handleResize() {
+  isMobileDevice = checkMobileDevice();
+  adjustGameSpeed();
+}
+
 // 事件监听
 document.addEventListener('keydown', control);
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', pauseGame);
 restartBtn.addEventListener('click', resetGame);
+window.addEventListener('resize', handleResize);
+
+// 初始化移动控制
+setupMobileControls();
+
+// 初始化移动设备检测
+isMobileDevice = checkMobileDevice();
 
 // 更新游戏控制函数
 function startGame() {
@@ -501,7 +629,8 @@ function startGame() {
   }
   if (!timerId) {
     draw();
-    timerId = setInterval(moveDown, 500);
+    let gameSpeed = adjustGameSpeed();
+    timerId = setInterval(moveDown, gameSpeed);
     nextRandom = Math.floor(Math.random() * tetrominoes.length);
     displayNextPiece();
     startBtn.disabled = true;
@@ -520,7 +649,8 @@ function pauseGame() {
       pauseBtn.textContent = '继续';
       startBtn.disabled = true;
     } else {
-      timerId = setInterval(moveDown, 500);
+      let gameSpeed = adjustGameSpeed();
+      timerId = setInterval(moveDown, gameSpeed);
       isPaused = false;
       grid.classList.remove('paused');
       pauseBtn.textContent = '暂停';

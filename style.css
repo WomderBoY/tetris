@@ -8,12 +8,16 @@ body {
   margin: 0;
   height: 100vh;
   justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .game-container {
   display: flex;
   gap: 20px;
   align-items: flex-start;
   filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.7));
+  max-width: 100%;
 }
 #tetris-container {
   display: flex;
@@ -207,4 +211,130 @@ button:disabled {
   background: rgba(0, 0, 0, 0.8);
   padding: 10px 20px;
   border-radius: 5px;
+}
+
+/* 移动端虚拟按键样式 */
+.mobile-controls {
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 20px;
+}
+
+.control-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.control-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #333;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  touch-action: manipulation;
+}
+
+#drop-btn {
+  width: 100%;
+  border-radius: 35px;
+  font-size: 18px;
+}
+
+.control-btn:active {
+  transform: scale(0.95);
+  background: #555;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  body {
+    padding: 10px 5px;
+    justify-content: flex-start;
+    padding-top: 20px;
+  }
+  
+  .game-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .mobile-controls {
+    display: flex;
+  }
+  
+  .instructions {
+    display: none;
+  }
+  
+  #tetris {
+    width: 240px;
+    height: 380px;
+    grid-template-columns: repeat(10, 24px);
+    grid-template-rows: repeat(20, 19px);
+  }
+  
+  #preview-area {
+    width: 240px;
+    height: 60px;
+    grid-template-columns: repeat(10, 24px);
+    grid-template-rows: repeat(4, 15px);
+  }
+  
+  .cell {
+    width: 24px;
+    height: 19px;
+  }
+  
+  #preview-area .cell {
+    height: 15px;
+  }
+  
+  .game-info {
+    width: calc(100% - 40px);
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  #next-piece {
+    margin: 0 auto;
+  }
+  
+  .controls button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+/* 特小屏幕适配 */
+@media (max-width: 320px) {
+  #tetris {
+    width: 200px;
+    height: 320px;
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(20, 16px);
+  }
+  
+  #preview-area {
+    width: 200px;
+    grid-template-columns: repeat(10, 20px);
+  }
+  
+  .cell {
+    width: 20px;
+    height: 16px;
+  }
+  
+  .control-btn {
+    width: 60px;
+    height: 60px;
+  }
 } 

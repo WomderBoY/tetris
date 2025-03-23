@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>俄罗斯方块游戏</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -29,6 +30,21 @@
            ↓ : 加速下落<br>
            空格: 直接落下</p>
       </div>
+    </div>
+  </div>
+  
+  <!-- 添加移动端虚拟按键 -->
+  <div class="mobile-controls">
+    <div class="control-row">
+      <button id="rotate-btn" class="control-btn">↑</button>
+    </div>
+    <div class="control-row">
+      <button id="left-btn" class="control-btn">←</button>
+      <button id="down-btn" class="control-btn">↓</button>
+      <button id="right-btn" class="control-btn">→</button>
+    </div>
+    <div class="control-row">
+      <button id="drop-btn" class="control-btn">直接落下</button>
     </div>
   </div>
   
