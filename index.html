@@ -35,30 +35,27 @@
   
   <!-- 添加移动端虚拟按键 -->
   <div class="mobile-controls" id="mobile-controls">
-    <h3 class="mobile-title">触控操作</h3>
-    <div class="control-row">
-      <button id="rotate-btn" class="control-btn touch-button" type="button">
+    <div class="mobile-side left-side">
+      <div class="control-group">
+        <button id="left-btn" class="control-btn touch-button direction-btn" type="button">
+          <span class="btn-icon">←</span>
+        </button>
+        <button id="right-btn" class="control-btn touch-button direction-btn" type="button">
+          <span class="btn-icon">→</span>
+        </button>
+      </div>
+      <button id="down-btn" class="control-btn touch-button direction-btn" type="button">
+        <span class="btn-icon">↓</span>
+      </button>
+    </div>
+    
+    <div class="mobile-side right-side">
+      <button id="rotate-btn" class="control-btn touch-button action-btn" type="button">
         <span class="btn-icon">↑</span>
         <span class="btn-label">旋转</span>
       </button>
-    </div>
-    <div class="control-row">
-      <button id="left-btn" class="control-btn touch-button" type="button">
-        <span class="btn-icon">←</span>
-        <span class="btn-label">左移</span>
-      </button>
-      <button id="down-btn" class="control-btn touch-button" type="button">
-        <span class="btn-icon">↓</span>
-        <span class="btn-label">下移</span>
-      </button>
-      <button id="right-btn" class="control-btn touch-button" type="button">
-        <span class="btn-icon">→</span>
-        <span class="btn-label">右移</span>
-      </button>
-    </div>
-    <div class="control-row">
-      <button id="drop-btn" class="control-btn touch-button" type="button">
-        <span class="btn-icon">直接落下</span>
+      <button id="drop-btn" class="control-btn touch-button action-btn" type="button">
+        <span class="btn-icon">落下</span>
       </button>
     </div>
   </div>

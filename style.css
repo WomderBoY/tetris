@@ -213,31 +213,67 @@ button:disabled {
   border-radius: 5px;
 }
 
-/* 移动控制样式 */
+/* 移动控制样式 - 新布局 */
 .mobile-controls {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 10px;
   width: 100%;
   max-width: 300px;
-  padding: 15px;
+  padding: 10px;
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 10px;
 }
 
-.mobile-title {
-  margin-bottom: 15px;
-  color: #fff;
-  font-size: 18px;
-  text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+.mobile-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.control-row {
+.left-side {
   display: flex;
-  justify-content: center;
-  width: 100%;
-  margin: 5px 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.right-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-group {
+  display: flex;
+  gap: 8px;
+}
+
+/* 方向按钮 */
+.direction-btn {
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  background-color: #4CAF50;
+  border-radius: 10px;
+}
+
+/* 功能按钮 */
+.action-btn {
+  width: 60px;
+  height: 60px;
+  font-size: 18px;
+  background-color: #2196F3;
+  border-radius: 10px;
+}
+
+/* 下落按钮特殊样式 */
+#drop-btn {
+  width: 120px;
+  background-color: #F44336;
 }
 
 /* 触摸按钮基本样式 */
@@ -246,19 +282,13 @@ button:disabled {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 70px;
-  height: 70px;
-  margin: 0 5px;
-  font-size: 24px;
-  background-color: #4CAF50;
   color: white;
   border: none;
-  border-radius: 10px;
   cursor: pointer;
   user-select: none;
   touch-action: manipulation;
   position: relative;
-  -webkit-tap-highlight-color: transparent; /* 移除iOS触摸高亮 */
+  -webkit-tap-highlight-color: transparent;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.1s, background-color 0.1s;
 }
@@ -267,121 +297,197 @@ button:disabled {
 .btn-icon {
   font-size: 26px;
   font-weight: bold;
-  margin-bottom: 5px;
+}
+
+/* 按钮标签样式 */
+.btn-label {
+  font-size: 12px;
+  text-align: center;
+  width: 100%;
 }
 
 /* 按钮触摸反馈 */
 .touch-button:active {
-  background-color: #388E3C;
   transform: scale(0.95) translateY(2px);
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* 直接落下按钮样式 */
-#drop-btn {
-  width: 150px;
-  background-color: #F44336;
-  font-weight: bold;
+.direction-btn:active {
+  background-color: #388E3C;
+}
+
+.action-btn:active {
+  background-color: #1976D2;
 }
 
 #drop-btn:active {
   background-color: #D32F2F;
 }
 
-/* 按钮标签样式 */
-.btn-label {
-  font-size: 14px;
-  text-align: center;
-  width: 100%;
-}
-
-/* 修复按钮之间的间距 */
-#left-btn, #down-btn, #right-btn {
-  margin: 0 3px;
-}
-
 /* 响应式设计 */
 @media (max-width: 768px) {
   body {
-    padding: 10px 5px;
+    padding: 5px;
     justify-content: flex-start;
-    padding-top: 20px;
+    padding-top: 10px;
+    overflow-y: auto;
+    height: auto;
+    min-height: 100vh;
   }
   
   .game-container {
     flex-direction: column;
     align-items: center;
+    gap: 10px;
+    max-width: 100%;
+    padding-bottom: 10px;
   }
   
   .mobile-controls {
     display: flex !important;
+    margin-top: 5px;
+    padding: 8px;
   }
   
   .instructions {
     display: none;
   }
   
+  #tetris-container {
+    max-width: 100%;
+  }
+  
   #tetris {
-    width: 240px;
-    height: 380px;
-    grid-template-columns: repeat(10, 24px);
-    grid-template-rows: repeat(20, 19px);
+    width: 220px;
+    height: 320px;
+    grid-template-columns: repeat(10, 22px);
+    grid-template-rows: repeat(20, 16px);
   }
   
   #preview-area {
-    width: 240px;
-    height: 60px;
-    grid-template-columns: repeat(10, 24px);
-    grid-template-rows: repeat(4, 15px);
+    width: 220px;
+    height: 48px;
+    grid-template-columns: repeat(10, 22px);
+    grid-template-rows: repeat(3, 16px);
   }
   
   .cell {
-    width: 24px;
-    height: 19px;
+    width: 22px;
+    height: 16px;
+    border-width: 1px;
   }
   
   #preview-area .cell {
-    height: 15px;
+    height: 16px;
   }
   
   .game-info {
-    width: calc(100% - 40px);
-    padding: 15px;
-    gap: 10px;
+    width: calc(100% - 20px);
+    max-width: 220px;
+    padding: 10px;
+    gap: 8px;
+    margin-top: 0;
   }
   
   #next-piece {
     margin: 0 auto;
+    width: 80px;
+    height: 80px;
+    grid-template-columns: repeat(5, 16px);
+    grid-template-rows: repeat(5, 16px);
+  }
+  
+  #next-piece .cell {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .controls {
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 5px;
   }
   
   .controls button {
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: 6px 10px;
+    font-size: 13px;
+    flex: 1;
+    min-width: 60px;
+  }
+  
+  #score {
+    font-size: 18px;
+    margin: 0;
+  }
+  
+  /* 移动端控制按钮样式 */
+  .direction-btn, .action-btn {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .control-group {
+    gap: 5px;
+  }
+  
+  .mobile-side {
+    gap: 5px;
+  }
+  
+  #drop-btn {
+    width: 100px;
+  }
+  
+  .btn-icon {
+    font-size: 22px;
+  }
+  
+  .btn-label {
+    font-size: 10px;
   }
 }
 
 /* 特小屏幕适配 */
 @media (max-width: 320px) {
+  body {
+    padding: 3px;
+  }
+  
   #tetris {
-    width: 200px;
-    height: 320px;
-    grid-template-columns: repeat(10, 20px);
-    grid-template-rows: repeat(20, 16px);
+    width: 180px;
+    height: 280px;
+    grid-template-columns: repeat(10, 18px);
+    grid-template-rows: repeat(20, 14px);
   }
   
   #preview-area {
-    width: 200px;
-    grid-template-columns: repeat(10, 20px);
+    width: 180px;
+    height: 42px;
+    grid-template-columns: repeat(10, 18px);
+    grid-template-rows: repeat(3, 14px);
   }
   
   .cell {
-    width: 20px;
-    height: 16px;
+    width: 18px;
+    height: 14px;
   }
   
-  .control-btn {
-    width: 60px;
-    height: 60px;
+  .direction-btn, .action-btn {
+    width: 45px;
+    height: 45px;
+  }
+  
+  #drop-btn {
+    width: 90px;
+  }
+  
+  .btn-icon {
+    font-size: 20px;
+  }
+  
+  .mobile-controls {
+    padding: 5px;
   }
 }
 
