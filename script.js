@@ -25,6 +25,9 @@ let isPaused = false;
 let nextRandom = 0;
 let isMobileDevice = false;
 
+// 添加防抖标志
+let isDropping = false;
+
 // 检测是否为移动设备
 function checkMobileDevice() {
   return (window.innerWidth <= 768) || 
@@ -32,6 +35,67 @@ function checkMobileDevice() {
          (navigator.maxTouchPoints > 0) || 
          (navigator.msMaxTouchPoints > 0);
 }
+
+// 强制显示移动端控制按钮，不依赖于设备检测结果
+function forceMobileControls() {
+  const mobileControls = document.querySelector('.mobile-controls');
+  if (mobileControls) {
+    mobileControls.style.display = 'flex';
+    console.log("强制显示移动端控制按钮");
+  }
+}
+
+// 初始化所有控制
+function initializeControls() {
+  console.log("初始化所有控制按钮...");
+  
+  // 确保游戏控制按钮已绑定事件
+  if (startBtn) startBtn.addEventListener('click', startGame);
+  if (pauseBtn) pauseBtn.addEventListener('click', pauseGame);
+  if (restartBtn) restartBtn.addEventListener('click', resetGame);
+  
+  // 设置移动端控制
+  setupMobileControls();
+  
+  // 强制显示移动控制
+  forceMobileControls();
+  
+  // 防止文档滚动 - 使用更直接的方法禁用触摸区域内的滚动
+  const mobileControls = document.querySelector('.mobile-controls');
+  if (mobileControls) {
+    mobileControls.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+    }, { passive: false });
+    
+    // 确保移动区域内的按钮不触发页面滚动
+    const buttons = mobileControls.querySelectorAll('.control-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('touchmove', function(e) {
+        e.preventDefault();
+      }, { passive: false });
+    });
+  }
+  
+  console.log("所有控制按钮初始化完成");
+}
+
+// 在页面加载完成后手动显示移动控制
+window.addEventListener('DOMContentLoaded', function() {
+  console.log("DOM加载完成，初始化游戏控制...");
+  
+  // 初始化移动设备检测
+  isMobileDevice = checkMobileDevice();
+  
+  // 设置DOM元素样式，确保移动控制按钮显示
+  const mobileControls = document.querySelector('.mobile-controls');
+  if (mobileControls) {
+    mobileControls.style.display = 'flex';
+    console.log("移动控制按钮容器已显示");
+  }
+  
+  // 初始化移动控制
+  initializeControls();
+});
 
 // 初始化游戏格子
 for (let i = 0; i < width * height; i++) {
@@ -201,10 +265,12 @@ function undrawGhost() {
 
 // 下落函数
 function moveDown() {
-  undraw();
-  currentPosition += width;
-  draw();
-  freeze();
+  if (timerId && !isPaused) {
+    undraw();
+    currentPosition += width;
+    draw();
+    freeze();
+  }
 }
 
 // 冻结函数：当方块触底或碰到已有方块时冻结
@@ -266,93 +332,100 @@ function checkRow() {
 
 // 向左移动
 function moveLeft() {
-  undraw();
-  const isAtLeftEdge = currentTetromino.some(index => {
-    const position = currentPosition + index;
-    return position >= 0 && (position % width === 0);
-  });
-  if (!isAtLeftEdge) currentPosition -= 1;
-  if (currentTetromino.some(index => {
-    const position = currentPosition + index;
-    return position >= 0 && position < width * height && 
-           cells[position].classList.contains('frozen');
-  })) {
-    currentPosition += 1;
+  if (timerId && !isPaused) {
+    undraw();
+    const isAtLeftEdge = currentTetromino.some(index => {
+      const position = currentPosition + index;
+      return position >= 0 && (position % width === 0);
+    });
+    if (!isAtLeftEdge) currentPosition -= 1;
+    if (currentTetromino.some(index => {
+      const position = currentPosition + index;
+      return position >= 0 && position < width * height && 
+             cells[position].classList.contains('frozen');
+    })) {
+      currentPosition += 1;
+    }
+    draw();
   }
-  draw();
 }
 
 // 向右移动
 function moveRight() {
-  undraw();
-  const isAtRightEdge = currentTetromino.some(index => {
-    const position = currentPosition + index;
-    return position >= 0 && (position % width === width - 1);
-  });
-  if (!isAtRightEdge) currentPosition += 1;
-  if (currentTetromino.some(index => {
-    const position = currentPosition + index;
-    return position >= 0 && position < width * height && 
-           cells[position].classList.contains('frozen');
-  })) {
-    currentPosition -= 1;
+  if (timerId && !isPaused) {
+    undraw();
+    const isAtRightEdge = currentTetromino.some(index => {
+      const position = currentPosition + index;
+      return position >= 0 && (position % width === width - 1);
+    });
+    if (!isAtRightEdge) currentPosition += 1;
+    if (currentTetromino.some(index => {
+      const position = currentPosition + index;
+      return position >= 0 && position < width * height && 
+             cells[position].classList.contains('frozen');
+    })) {
+      currentPosition -= 1;
+    }
+    draw();
   }
-  draw();
 }
 
 // 旋转
 function rotate() {
-  undraw();
-  const previousRotation = currentRotation;
-  const prevPosition = currentPosition;
-  
-  // 尝试旋转
-  currentRotation = (currentRotation + 1) % 4;
-  currentTetromino = tetrominoes[random][currentRotation];
+  if (timerId && !isPaused) {
+    console.log("执行旋转操作");
+    undraw();
+    const previousRotation = currentRotation;
+    const prevPosition = currentPosition;
+    
+    // 尝试旋转
+    currentRotation = (currentRotation + 1) % 4;
+    currentTetromino = tetrominoes[random][currentRotation];
 
-  // 处理I形方块特殊情况（需要更多的调整空间）
-  const isIPiece = random === 6; // I形方块的索引是6
-  
-  // 确定墙踢（wall kick）的测试位置
-  const testOffsets = isIPiece ? 
-    [
-      // I形方块需要更多测试位置
-      0,           // 原位置
-      -1, 1,       // 左右偏移1格
-      -2, 2,       // 左右偏移2格
-      -width,      // 向上偏移
-      width,       // 向下偏移
-      -1-width,    // 左上偏移
-      1-width,     // 右上偏移
-      -1+width,    // 左下偏移
-      1+width      // 右下偏移
-    ] : 
-    // 其他方块的测试位置
-    [0, -1, 1, -1+width, 1+width];
+    // 处理I形方块特殊情况（需要更多的调整空间）
+    const isIPiece = random === 6; // I形方块的索引是6
     
-  // 检查旋转后是否有碰撞或超出边界
-  if (checkCollision()) {
-    // 尝试不同的位置调整
-    let validPositionFound = false;
-    
-    for (let offset of testOffsets) {
-      currentPosition += offset;
-      if (!checkCollision()) {
-        validPositionFound = true;
-        break;
+    // 确定墙踢（wall kick）的测试位置
+    const testOffsets = isIPiece ? 
+      [
+        // I形方块需要更多测试位置
+        0,           // 原位置
+        -1, 1,       // 左右偏移1格
+        -2, 2,       // 左右偏移2格
+        -width,      // 向上偏移
+        width,       // 向下偏移
+        -1-width,    // 左上偏移
+        1-width,     // 右上偏移
+        -1+width,    // 左下偏移
+        1+width      // 右下偏移
+      ] : 
+      // 其他方块的测试位置
+      [0, -1, 1, -1+width, 1+width];
+      
+    // 检查旋转后是否有碰撞或超出边界
+    if (checkCollision()) {
+      // 尝试不同的位置调整
+      let validPositionFound = false;
+      
+      for (let offset of testOffsets) {
+        currentPosition += offset;
+        if (!checkCollision()) {
+          validPositionFound = true;
+          break;
+        }
+        currentPosition = prevPosition; // 恢复原始位置以尝试下一个偏移
       }
-      currentPosition = prevPosition; // 恢复原始位置以尝试下一个偏移
+      
+      // 如果所有调整都失败，恢复原来的旋转状态和位置
+      if (!validPositionFound) {
+        currentPosition = prevPosition;
+        currentRotation = previousRotation;
+        currentTetromino = tetrominoes[random][currentRotation];
+      }
     }
     
-    // 如果所有调整都失败，恢复原来的旋转状态和位置
-    if (!validPositionFound) {
-      currentPosition = prevPosition;
-      currentRotation = previousRotation;
-      currentTetromino = tetrominoes[random][currentRotation];
-    }
+    draw();
   }
-  
-  draw();
 }
 
 // 检查碰撞和边界
@@ -498,99 +571,155 @@ function control(e) {
 
 // 添加快速下落功能
 function hardDrop() {
-  undraw();
-  currentPosition = getGhostPosition();
-  draw();
-  freeze();
+  if (timerId && !isPaused && !isDropping) {
+    isDropping = true; // 设置防抖标志
+    console.log("执行直接落下");
+    
+    undraw();
+    currentPosition = getGhostPosition();
+    draw();
+    freeze();
+    
+    // 500ms后重置标志，这个时间应该足够一个方块完成落下过程
+    setTimeout(() => {
+      isDropping = false;
+    }, 500);
+  }
 }
 
 // 设置移动端虚拟按键
 function setupMobileControls() {
-  // 左按钮
-  leftBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      moveLeft();
+  console.log("重新设置移动控制按钮 - 添加触摸事件");
+  
+  // 获取所有按钮引用
+  const mLeftBtn = document.getElementById('left-btn');
+  const mRightBtn = document.getElementById('right-btn');
+  const mDownBtn = document.getElementById('down-btn');
+  const mRotateBtn = document.getElementById('rotate-btn');
+  const mDropBtn = document.getElementById('drop-btn');
+  
+  console.log("获取到按钮:", !!mLeftBtn, !!mRightBtn, !!mDownBtn, !!mRotateBtn, !!mDropBtn);
+  
+  // 移除旧的事件
+  [mLeftBtn, mRightBtn, mDownBtn, mRotateBtn, mDropBtn].forEach(btn => {
+    if (btn) {
+      btn.onclick = null;
+      
+      // 移除所有事件监听器的最彻底方法是克隆并替换节点
+      const newBtn = btn.cloneNode(true);
+      if (btn.parentNode) {
+        btn.parentNode.replaceChild(newBtn, btn);
+      }
     }
   });
   
-  // 加入长按持续移动
-  let leftInterval;
-  leftBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      moveLeft();
-      leftInterval = setInterval(moveLeft, 150);
-    }
-  });
-  leftBtn.addEventListener('touchend', function() {
-    clearInterval(leftInterval);
-  });
+  // 重新获取引用（因为刚替换了节点）
+  const leftBtn = document.getElementById('left-btn');
+  const rightBtn = document.getElementById('right-btn');
+  const downBtn = document.getElementById('down-btn');
+  const rotateBtn = document.getElementById('rotate-btn');
+  const dropBtn = document.getElementById('drop-btn');
   
-  // 右按钮
-  rightBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      moveRight();
-    }
-  });
+  // 防抖变量，防止快速多次点击
+  let canMove = true;
   
-  // 加入长按持续移动
-  let rightInterval;
-  rightBtn.addEventListener('touchstart', function(e) {
+  // 通用事件处理函数
+  function handleButtonEvent(e, action) {
+    // 阻止默认行为和事件冒泡
     e.preventDefault();
-    if (timerId && !isPaused) {
-      moveRight();
-      rightInterval = setInterval(moveRight, 150);
+    e.stopPropagation();
+    
+    // 执行相应操作
+    if (canMove && timerId && !isPaused) {
+      canMove = false;
+      action();
+      setTimeout(() => { canMove = true; }, 100);
     }
-  });
-  rightBtn.addEventListener('touchend', function() {
-    clearInterval(rightInterval);
-  });
+    return false;
+  }
   
-  // 下按钮
-  downBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      moveDown();
-    }
-  });
+  // 添加触摸事件
+  if (leftBtn) {
+    leftBtn.addEventListener('touchstart', function(e) {
+      console.log("左移触摸");
+      handleButtonEvent(e, moveLeft);
+    }, { passive: false, capture: true });
+    
+    leftBtn.addEventListener('click', function(e) {
+      console.log("左移点击");
+      handleButtonEvent(e, moveLeft);
+    }, { passive: false, capture: true });
+  }
   
-  // 加入长按持续下移
-  let downInterval;
-  downBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      moveDown();
-      downInterval = setInterval(moveDown, 100);
-    }
-  });
-  downBtn.addEventListener('touchend', function() {
-    clearInterval(downInterval);
-  });
+  if (rightBtn) {
+    rightBtn.addEventListener('touchstart', function(e) {
+      console.log("右移触摸");
+      handleButtonEvent(e, moveRight);
+    }, { passive: false, capture: true });
+    
+    rightBtn.addEventListener('click', function(e) {
+      console.log("右移点击");
+      handleButtonEvent(e, moveRight);
+    }, { passive: false, capture: true });
+  }
   
-  // 旋转按钮
-  rotateBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      rotate();
-    }
-  });
+  if (downBtn) {
+    downBtn.addEventListener('touchstart', function(e) {
+      console.log("下移触摸");
+      handleButtonEvent(e, moveDown);
+    }, { passive: false, capture: true });
+    
+    downBtn.addEventListener('click', function(e) {
+      console.log("下移点击");
+      handleButtonEvent(e, moveDown);
+    }, { passive: false, capture: true });
+  }
   
-  // 直接落下按钮
-  dropBtn.addEventListener('touchstart', function(e) {
-    e.preventDefault();
-    if (timerId && !isPaused) {
-      hardDrop();
-    }
-  });
+  if (rotateBtn) {
+    rotateBtn.addEventListener('touchstart', function(e) {
+      console.log("旋转触摸");
+      handleButtonEvent(e, rotate);
+    }, { passive: false, capture: true });
+    
+    rotateBtn.addEventListener('click', function(e) {
+      console.log("旋转点击");
+      handleButtonEvent(e, rotate);
+    }, { passive: false, capture: true });
+  }
   
-  // 防止触摸时页面滚动
-  document.addEventListener('touchmove', function(e) {
-    if (e.target.classList.contains('control-btn')) {
+  if (dropBtn) {
+    dropBtn.addEventListener('touchstart', function(e) {
       e.preventDefault();
-    }
-  }, { passive: false });
+      e.stopPropagation();
+      console.log("落下触摸");
+      if (timerId && !isPaused && !isDropping) {
+        hardDrop();
+      }
+      return false;
+    }, { passive: false, capture: true });
+    
+    dropBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log("落下点击");
+      if (timerId && !isPaused && !isDropping) {
+        hardDrop();
+      }
+      return false;
+    }, { passive: false, capture: true });
+  }
+  
+  // 防止触摸控制区域时页面滚动
+  const mobileControls = document.querySelector('.mobile-controls');
+  if (mobileControls) {
+    mobileControls.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }, { passive: false, capture: true });
+  }
+  
+  console.log("移动控制按钮事件已重新绑定 - 使用触摸事件");
 }
 
 // 调整游戏速度根据设备类型
@@ -607,20 +736,32 @@ function adjustGameSpeed() {
 function handleResize() {
   isMobileDevice = checkMobileDevice();
   adjustGameSpeed();
+  
+  // 当窗口尺寸变化时，确保移动控制按钮在小屏幕上显示
+  const mobileControls = document.querySelector('.mobile-controls');
+  if (mobileControls) {
+    if (isMobileDevice || window.innerWidth <= 768) {
+      mobileControls.style.display = 'flex';
+    } else {
+      mobileControls.style.display = 'none';
+    }
+  }
 }
 
 // 事件监听
 document.addEventListener('keydown', control);
-startBtn.addEventListener('click', startGame);
-pauseBtn.addEventListener('click', pauseGame);
-restartBtn.addEventListener('click', resetGame);
 window.addEventListener('resize', handleResize);
 
-// 初始化移动控制
-setupMobileControls();
-
-// 初始化移动设备检测
-isMobileDevice = checkMobileDevice();
+// 在页面内容完全加载后初始化游戏
+window.addEventListener('load', function() {
+  // 初始化移动设备检测
+  isMobileDevice = checkMobileDevice();
+  // 初始化所有控制
+  initializeControls();
+  // 绘制初始方块
+  draw();
+  console.log("游戏完全加载并初始化完成");
+});
 
 // 更新游戏控制函数
 function startGame() {
