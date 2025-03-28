@@ -22,6 +22,15 @@
         <button id="start-btn">开始游戏</button>
         <button id="pause-btn" disabled>暂停</button>
         <button id="restart-btn" disabled>重新开始</button>
+        
+        <!-- 添加难度选择 -->
+        <div class="difficulty-selector">
+          <span class="difficulty-label">难度:</span>
+          <div class="difficulty-options">
+            <button id="normal-btn" class="difficulty-btn active">普通</button>
+            <button id="hard-btn" class="difficulty-btn">困难</button>
+          </div>
+        </div>
       </div>
       <div class="instructions">
         <h3>游戏说明:</h3>
@@ -52,7 +61,7 @@
     <div class="mobile-side right-side">
       <button id="rotate-btn" class="control-btn touch-button action-btn" type="button">
         <span class="btn-icon">↑</span>
-        <span class="btn-label">旋转</span>
+        <span class="btn-label"></span>
       </button>
       <button id="drop-btn" class="control-btn touch-button action-btn" type="button">
         <span class="btn-icon">落下</span>

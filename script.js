@@ -19,6 +19,8 @@ let cells = [];
 let previewCells = [];
 let nextPieceCells = [];
 let score = 0;
+let lineCount = 0;
+let level = 1;
 let timerId = null;
 let isGameOver = false;
 let isPaused = false;
@@ -27,6 +29,17 @@ let isMobileDevice = false;
 
 // 添加防抖标志
 let isDropping = false;
+
+// 添加难度设置
+let difficultyLevel = 'normal'; // 默认难度为普通
+const normalSpeed = 500;
+const hardSpeed = 300;
+const speedReductionPerLevel = 25; // 每升一级减少的毫秒数
+const minSpeed = 200; // 最小下落时间（毫秒）
+
+// 获取难度按钮
+const normalBtn = document.getElementById('normal-btn');
+const hardBtn = document.getElementById('hard-btn');
 
 // 检测是否为移动设备
 function checkMobileDevice() {
@@ -53,6 +66,20 @@ function initializeControls() {
   if (startBtn) startBtn.addEventListener('click', startGame);
   if (pauseBtn) pauseBtn.addEventListener('click', pauseGame);
   if (restartBtn) restartBtn.addEventListener('click', resetGame);
+  
+  // 确保难度按钮已绑定事件
+  if (normalBtn) normalBtn.addEventListener('click', function() {
+    setDifficulty('normal');
+    updateDifficultyButtons();
+  });
+  
+  if (hardBtn) hardBtn.addEventListener('click', function() {
+    setDifficulty('hard');
+    updateDifficultyButtons();
+  });
+  
+  // 更新难度按钮初始状态
+  updateDifficultyButtons();
   
   // 设置移动端控制
   setupMobileControls();
@@ -310,12 +337,20 @@ function freeze() {
 
 // 检查并清除满行
 function checkRow() {
+  let rowsCleared = 0;
+  const initialLines = lineCount; // 记录清除前的行数
+  
   for (let i = 0; i < height; i++) {
     const rowStart = i * width;
     const row = cells.slice(rowStart, rowStart + width);
     if (row.every(cell => cell.classList.contains('frozen'))) {
+      rowsCleared++;
       score += 10;
-      scoreDisplay.innerHTML = "分数: " + score;
+      lineCount++;
+      
+      // 更新分数显示
+      updateScore();
+      
       row.forEach(cell => {
         cell.classList.remove('frozen');
         cell.classList.remove('filled');
@@ -326,6 +361,38 @@ function checkRow() {
       cells = removed.concat(cells);
       // 重新设置 grid 中的单元格顺序
       cells.forEach(cell => grid.appendChild(cell));
+    }
+  }
+  
+  // 只有在清除了行后才需要检查等级
+  if (rowsCleared > 0) {
+    // 检查是否跨越了多个升级点
+    checkMultipleLevelUps(initialLines, lineCount);
+    console.log(`清除了${rowsCleared}行，总行数:${lineCount}，当前等级:${level}`);
+  }
+}
+
+// 检查是否需要多次升级
+function checkMultipleLevelUps(oldLines, newLines) {
+  // 计算旧行数对应的等级
+  const oldLevel = Math.floor(oldLines / 10) + 1;
+  // 计算新行数对应的等级
+  const newLevel = Math.floor(newLines / 10) + 1;
+  
+  // 如果等级应该变化
+  if (newLevel > oldLevel) {
+    // 直接设置为新的等级
+    level = newLevel;
+    
+    // 更新游戏速度
+    if (timerId) {
+      clearInterval(timerId);
+      // 每级减少25ms而不是50ms，并且设置最小速度为200ms
+      const baseSpeed = getGameSpeed(); // 基础速度
+      const newSpeed = Math.max(baseSpeed - (level - 1) * speedReductionPerLevel, minSpeed);
+      
+      timerId = setInterval(moveDown, newSpeed);
+      console.log(`升级! 当前等级:${level}, 速度:${newSpeed}ms`);
     }
   }
 }
@@ -547,9 +614,14 @@ function gameOver() {
   isGameOver = true;
   startBtn.disabled = false;
   pauseBtn.disabled = true;
+  restartBtn.disabled = false;  // 确保重新开始按钮可用
+  
   // 清除预览区域
   clearPreviewArea();
-  alert("游戏结束！最终得分：" + score);
+  
+  // 游戏结束提示
+  alert(`游戏结束！\n最终得分：${score}\n消除行数：${lineCount}\n达到等级：${level}`);
+  console.log(`游戏结束 - 得分:${score}, 行数:${lineCount}, 等级:${level}`);
 }
 
 // 键盘控制
@@ -722,20 +794,21 @@ function setupMobileControls() {
   console.log("移动控制按钮事件已重新绑定 - 使用触摸事件");
 }
 
-// 调整游戏速度根据设备类型
+// 调整游戏速度根据设备类型和难度
 function adjustGameSpeed() {
-  let gameSpeed = isMobileDevice ? 600 : 500;  // 移动设备上稍慢一些
-  if (timerId) {
-    clearInterval(timerId);
-    timerId = setInterval(moveDown, gameSpeed);
-  }
-  return gameSpeed;
+  return getGameSpeed();  // 使用基于难度的速度设置
 }
 
 // 响应窗口大小变化
 function handleResize() {
   isMobileDevice = checkMobileDevice();
-  adjustGameSpeed();
+  
+  if (timerId) {
+    clearInterval(timerId);
+    let gameSpeed = getGameSpeed();
+    timerId = setInterval(moveDown, gameSpeed);
+    console.log(`窗口大小变化，调整速度: ${gameSpeed}ms`);
+  }
   
   // 当窗口尺寸变化时，确保移动控制按钮在小屏幕上显示
   const mobileControls = document.querySelector('.mobile-controls');
@@ -765,50 +838,50 @@ window.addEventListener('load', function() {
 
 // 更新游戏控制函数
 function startGame() {
-  if (isGameOver) {
-    resetGame();
-  }
   if (!timerId) {
-    draw();
-    let gameSpeed = adjustGameSpeed();
+    let gameSpeed = getGameSpeed();
     timerId = setInterval(moveDown, gameSpeed);
-    nextRandom = Math.floor(Math.random() * tetrominoes.length);
-    displayNextPiece();
+    console.log(`游戏开始，难度: ${difficultyLevel}, 速度: ${gameSpeed}ms`);
     startBtn.disabled = true;
     pauseBtn.disabled = false;
-    restartBtn.disabled = false;
+    restartBtn.disabled = false;  // 确保重新开始按钮可用
+    isPaused = false;
   }
 }
 
 function pauseGame() {
-  if (!isGameOver) {
-    if (timerId) {
-      clearInterval(timerId);
-      timerId = null;
-      isPaused = true;
-      grid.classList.add('paused');
-      pauseBtn.textContent = '继续';
-      startBtn.disabled = true;
-    } else {
-      let gameSpeed = adjustGameSpeed();
-      timerId = setInterval(moveDown, gameSpeed);
-      isPaused = false;
-      grid.classList.remove('paused');
-      pauseBtn.textContent = '暂停';
-    }
+  if (timerId && !isPaused) {
+    clearInterval(timerId);
+    timerId = null;
+    isPaused = true;
+    pauseBtn.textContent = '继续';
+    console.log('游戏暂停');
+  } else if (!timerId && isPaused) {
+    let gameSpeed = getGameSpeed();
+    timerId = setInterval(moveDown, gameSpeed);
+    isPaused = false;
+    pauseBtn.textContent = '暂停';
+    console.log(`游戏继续，速度: ${gameSpeed}ms`);
   }
 }
 
 function resetGame() {
   clearInterval(timerId);
   timerId = null;
-  score = 0;
-  isGameOver = false;
   isPaused = false;
-  scoreDisplay.innerHTML = "分数: 0";
-  grid.classList.remove('paused');
+  isGameOver = false;
+  pauseBtn.textContent = '暂停';
+  pauseBtn.disabled = true;
+  restartBtn.disabled = true;
+  startBtn.disabled = false;
   
-  // 清空所有格子
+  // 重置游戏状态
+  score = 0;
+  lineCount = 0;
+  level = 1;
+  updateScore();
+  
+  // 清空游戏区域
   cells.forEach(cell => {
     cell.classList.remove('filled');
     cell.classList.remove('frozen');
@@ -822,17 +895,70 @@ function resetGame() {
   });
   
   // 重置当前方块
-  currentPosition = 4 - width * 2; // 从更高的位置开始，使整个方块可见
+  currentPosition = 4 - width * 2;
   random = Math.floor(Math.random() * tetrominoes.length);
   currentRotation = 0;
   currentTetromino = tetrominoes[random][currentRotation];
   currentColor = tetrominoColors[random];
+  nextRandom = Math.floor(Math.random() * tetrominoes.length);
   
-  startBtn.disabled = false;
-  pauseBtn.disabled = true;
-  restartBtn.disabled = true;
-  pauseBtn.textContent = '暂停';
+  // 重新绘制
+  draw();
+  displayNextPiece();
+  console.log('游戏重置');
 }
 
 // 初次绘制
-draw(); 
+draw();
+
+// 设置难度按钮事件
+normalBtn.addEventListener('click', function() {
+  setDifficulty('normal');
+  updateDifficultyButtons();
+});
+
+hardBtn.addEventListener('click', function() {
+  setDifficulty('hard');
+  updateDifficultyButtons();
+});
+
+// 设置难度函数
+function setDifficulty(level) {
+  difficultyLevel = level;
+  
+  // 如果游戏正在进行，更新下落速度
+  if (timerId) {
+    clearInterval(timerId);
+    let gameSpeed = getGameSpeed();
+    timerId = setInterval(moveDown, gameSpeed);
+  }
+  
+  console.log(`难度已设置为: ${level}, 下落速度: ${getGameSpeed()}ms`);
+}
+
+// 获取当前难度对应的游戏速度
+function getGameSpeed() {
+  // 根据难度和设备类型调整速度
+  if (difficultyLevel === 'hard') {
+    return isMobileDevice ? hardSpeed + 100 : hardSpeed; // 移动设备上稍微慢一点
+  } else {
+    return isMobileDevice ? normalSpeed + 100 : normalSpeed; // 移动设备上稍微慢一点
+  }
+}
+
+// 更新难度按钮显示状态
+function updateDifficultyButtons() {
+  normalBtn.classList.remove('active');
+  hardBtn.classList.remove('active');
+  
+  if (difficultyLevel === 'normal') {
+    normalBtn.classList.add('active');
+  } else {
+    hardBtn.classList.add('active');
+  }
+}
+
+// 更新分数显示
+function updateScore() {
+  scoreDisplay.innerHTML = `分数: ${score} | 行数: ${lineCount} | 等级: ${level}`;
+} 

@@ -156,9 +156,16 @@ body {
   backdrop-filter: blur(5px);
 }
 #score {
-  font-size: 24px;
+  font-size: 16px;
   text-align: center;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 #next-piece {
   border: 2px solid #fff;
@@ -446,6 +453,22 @@ button:disabled {
   .btn-label {
     font-size: 10px;
   }
+  
+  /* 移动端难度选择器样式 */
+  .difficulty-selector {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  
+  .difficulty-label {
+    font-size: 14px;
+    margin-bottom: 3px;
+  }
+  
+  .difficulty-btn {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
 }
 
 /* 特小屏幕适配 */
@@ -495,4 +518,60 @@ button:disabled {
   .mobile-controls {
     display: none;
   }
+}
+
+/* 难度选择器样式 */
+.difficulty-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding-top: 10px;
+  width: 100%;
+}
+
+.difficulty-label {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 5px;
+}
+
+.difficulty-options {
+  display: flex;
+  gap: 5px;
+  width: 100%;
+}
+
+.difficulty-btn {
+  flex: 1;
+  padding: 8px 10px;
+  background-color: #555;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.difficulty-btn:hover {
+  background-color: #666;
+}
+
+.difficulty-btn.active {
+  background-color: #4CAF50;
+  font-weight: bold;
+}
+
+.difficulty-btn.active:hover {
+  background-color: #45a049;
+}
+
+#hard-btn.active {
+  background-color: #F44336;
+}
+
+#hard-btn.active:hover {
+  background-color: #d32f2f;
 } 
