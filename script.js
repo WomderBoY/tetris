@@ -854,6 +854,8 @@ window.addEventListener('load', function() {
   initializeControls();
   // 加载历史最高分
   loadHighScore();
+  // 调整移动端界面比例
+  adjustMobileScale();
   // 绘制初始方块
   draw();
   console.log("游戏完全加载并初始化完成");
@@ -983,7 +985,18 @@ function updateDifficultyButtons() {
 
 // 更新分数显示
 function updateScore() {
-  scoreDisplay.innerHTML = `分数: ${score} | 最高分: ${highScore} | 行数: ${lineCount} | 等级: ${level}`;
+  // 为移动设备优化分数显示格式
+  if (window.innerWidth <= 768) {
+    scoreDisplay.innerHTML = `
+      <span>分数: ${score}</span>
+      <span>最高分: ${highScore}</span>
+      <span>行数: ${lineCount}</span>
+      <span>等级: ${level}</span>
+    `;
+  } else {
+    // 桌面设备使用原来的格式
+    scoreDisplay.innerHTML = `分数: ${score} | 最高分: ${highScore} | 行数: ${lineCount} | 等级: ${level}`;
+  }
 }
 
 // 从localStorage加载历史最高分
@@ -1013,4 +1026,70 @@ function resetHighScore() {
   localStorage.removeItem('tetrisHighScore');
   updateScore();
   console.log('最高分已重置');
+}
+
+// 添加窗口大小调整监听
+window.addEventListener('resize', function() {
+  // 窗口大小变化时更新分数显示格式
+  updateScore();
+  
+  // 更新移动设备检测标志
+  isMobileDevice = checkMobileDevice();
+  
+  // 调整移动端界面比例
+  adjustMobileScale();
+  
+  // 如果游戏正在运行，更新游戏速度
+  if (timerId) {
+    clearInterval(timerId);
+    const speed = calculateFallingSpeed();
+    timerId = setInterval(moveDown, speed);
+  }
+});
+
+// 调整移动端界面比例
+function adjustMobileScale() {
+  if (!isMobileDevice) return;
+  
+  const tetrisContainer = document.getElementById('tetris-container');
+  const gameInfo = document.querySelector('.game-info');
+  
+  if (!tetrisContainer || !gameInfo) return;
+  
+  // 获取可视区域高度
+  const viewportHeight = window.innerHeight;
+  
+  // 根据可视区域高度调整缩放比例
+  if (viewportHeight < 600) {
+    // 非常小的屏幕
+    tetrisContainer.style.transform = 'scale(0.75)';
+    tetrisContainer.style.margin = '-30px 0';
+    gameInfo.style.transform = 'scale(0.85)';
+    gameInfo.style.margin = '-15px 0';
+  } else if (viewportHeight < 700) {
+    // 较小的屏幕
+    tetrisContainer.style.transform = 'scale(0.85)';
+    tetrisContainer.style.margin = '-15px 0';
+    gameInfo.style.transform = 'scale(0.9)';
+    gameInfo.style.margin = '-10px 0';
+  } else {
+    // 较大的屏幕
+    tetrisContainer.style.transform = '';
+    tetrisContainer.style.margin = '';
+    gameInfo.style.transform = '';
+    gameInfo.style.margin = '';
+  }
+}
+
+// 计算当前级别的下落速度
+function calculateFallingSpeed() {
+  const baseSpeed = getGameSpeed();
+  const newSpeed = Math.max(baseSpeed - (level - 1) * speedReductionPerLevel, minSpeed);
+  
+  // 在移动设备上使用触摸控制时，增加一点点速度延迟，让玩家有更多反应时间
+  if (isMobileDevice && window.innerHeight < 700) {
+    return Math.min(newSpeed + 50, baseSpeed); // 增加最多50ms，但不超过基础速度
+  }
+  
+  return newSpeed;
 } 

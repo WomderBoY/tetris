@@ -12,7 +12,19 @@ body {
   box-sizing: border-box;
   overflow: hidden;
   background-image: linear-gradient(to bottom, #1a1a1a, #121212);
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in-out forwards;
 }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .game-container {
   display: flex;
   gap: 10px;
@@ -31,6 +43,7 @@ body {
   flex-direction: column;
   position: relative;
   filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+  transition: transform 0.3s ease;
 }
 #tetris-container::before {
   content: "";
@@ -165,6 +178,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
   min-width: 200px;
+  transition: transform 0.3s ease;
 }
 #score {
   font-size: 16px;
@@ -365,24 +379,38 @@ button:disabled {
   body {
     padding: 5px;
     justify-content: flex-start;
-    padding-top: 10px;
+    padding-top: 5px;
     overflow-y: auto;
     height: auto;
     min-height: 100vh;
+    padding-bottom: max(65px, env(safe-area-inset-bottom, 65px));
   }
   
   .game-container {
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
     max-width: 100%;
-    padding: 10px;
+    padding: 8px;
   }
   
   .mobile-controls {
     display: flex !important;
-    margin-top: 5px;
-    padding: 8px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(20, 20, 20, 0.9);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    z-index: 100;
+    padding: 8px 5px;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    margin: 0;
+    max-width: none;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 8px));
   }
   
   .instructions {
@@ -391,149 +419,97 @@ button:disabled {
   
   #tetris-container {
     max-width: 100%;
+    transform: scale(0.9);
+    margin: -10px 0;
   }
   
   #tetris {
-    width: 220px;
-    height: 340px;
-    grid-template-columns: repeat(10, 22px);
-    grid-template-rows: repeat(20, 17px);
+    width: 200px;
+    height: 300px;
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(20, 15px);
   }
   
   #preview-area {
-    width: 220px;
-    height: 44px;
-    grid-template-columns: repeat(10, 22px);
-    grid-template-rows: repeat(3, 15px);
+    width: 200px;
+    height: 40px;
+    grid-template-columns: repeat(10, 20px);
+    grid-template-rows: repeat(3, 13.33px);
   }
   
   .cell {
-    width: 22px;
-    height: 17px;
+    width: 20px;
+    height: 15px;
     border-width: 1px;
   }
   
   #preview-area .cell {
-    height: 15px;
+    height: 13.33px;
   }
   
   .game-info {
-    width: calc(100% - 20px);
+    width: calc(100% - 16px);
     max-width: 220px;
-    padding: 10px;
+    padding: 8px;
     gap: 6px;
     margin-top: 0;
+    transform: scale(0.95);
+    margin: -5px 0;
+  }
+  
+  #score {
+    font-size: 13px;
+    padding: 6px;
+    white-space: normal;
+    line-height: 1.3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  #score span {
+    margin: 0 2px;
   }
   
   #next-piece {
     margin: 0 auto;
-    width: 80px;
-    height: 80px;
-    grid-template-columns: repeat(5, 16px);
-    grid-template-rows: repeat(5, 16px);
+    width: 70px;
+    height: 70px;
+    grid-template-columns: repeat(5, 14px);
+    grid-template-rows: repeat(5, 14px);
   }
   
   #next-piece .cell {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
   
   .controls {
-    flex-direction: row;
-    justify-content: space-between;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 5px;
   }
   
   .controls button {
-    padding: 8px;
-    font-size: 13px;
-    flex: 1;
-    min-width: 60px;
-  }
-  
-  #score {
-    font-size: 14px;
+    padding: 6px;
+    font-size: 12px;
+    min-width: 0;
     margin: 0;
-    padding: 8px;
   }
   
   /* 移动端控制按钮样式 */
   .direction-btn, .action-btn {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
   }
   
   .control-group {
-    gap: 5px;
+    gap: 4px;
   }
   
   .mobile-side {
-    gap: 5px;
-  }
-  
-  #drop-btn {
-    width: 100px;
-  }
-  
-  .btn-icon {
-    font-size: 22px;
-  }
-  
-  .btn-label {
-    font-size: 10px;
-  }
-  
-  /* 移动端难度选择器样式 */
-  .difficulty-selector {
-    margin-top: 8px;
-    padding-top: 8px;
-  }
-  
-  .difficulty-label {
-    font-size: 14px;
-    margin-bottom: 3px;
-  }
-  
-  .difficulty-btn {
-    padding: 6px 8px;
-    font-size: 12px;
-  }
-  
-  .special-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-}
-
-/* 特小屏幕适配 */
-@media (max-width: 320px) {
-  body {
-    padding: 3px;
-  }
-  
-  #tetris {
-    width: 180px;
-    height: 280px;
-    grid-template-columns: repeat(10, 18px);
-    grid-template-rows: repeat(20, 14px);
-  }
-  
-  #preview-area {
-    width: 180px;
-    height: 42px;
-    grid-template-columns: repeat(10, 18px);
-    grid-template-rows: repeat(3, 14px);
-  }
-  
-  .cell {
-    width: 18px;
-    height: 14px;
-  }
-  
-  .direction-btn, .action-btn {
-    width: 45px;
-    height: 45px;
+    gap: 4px;
   }
   
   #drop-btn {
@@ -544,13 +520,93 @@ button:disabled {
     font-size: 20px;
   }
   
-  .mobile-controls {
-    padding: 5px;
+  /* 移动端难度选择器样式 */
+  .difficulty-selector {
+    margin-top: 4px;
+    padding-top: 4px;
+    width: 100%;
+    grid-column: span 2;
   }
   
+  .difficulty-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  
+  /* 特殊按钮布局 */
   .special-btn {
-    padding: 6px 10px;
+    grid-column: span 2;
+    margin-top: 4px;
+  }
+  
+  .difficulty-label {
     font-size: 12px;
+    margin-bottom: 2px;
+  }
+  
+  .difficulty-btn {
+    padding: 5px;
+    font-size: 11px;
+  }
+  
+  /* 移动设备下提高可点击性 */
+  .controls button, .difficulty-btn, .special-btn {
+    min-height: 35px;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .direction-btn, .action-btn {
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* 对超小屏幕特别处理 */
+@media (max-width: 350px) {
+  #tetris-container {
+    transform: scale(0.85);
+    margin: -15px 0;
+  }
+  
+  .game-info {
+    transform: scale(0.9);
+    margin: -10px 0;
+  }
+  
+  #tetris {
+    width: 180px;
+    height: 270px;
+    grid-template-columns: repeat(10, 18px);
+    grid-template-rows: repeat(20, 13.5px);
+  }
+  
+  #preview-area {
+    width: 180px;
+    height: 36px;
+    grid-template-columns: repeat(10, 18px);
+    grid-template-rows: repeat(3, 12px);
+  }
+  
+  .cell {
+    width: 18px;
+    height: 13.5px;
+  }
+  
+  #preview-area .cell {
+    height: 12px;
+  }
+  
+  .direction-btn, .action-btn {
+    width: 40px;
+    height: 40px;
+  }
+  
+  #drop-btn {
+    width: 80px;
+  }
+  
+  .mobile-controls {
+    padding: 3px;
   }
 }
 
