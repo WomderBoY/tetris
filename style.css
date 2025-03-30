@@ -1,28 +1,36 @@
 body {
-  background: #222;
+  background: #121212;
   color: #fff;
-  font-family: sans-serif;
+  font-family: 'Microsoft YaHei', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
   justify-content: center;
-  padding: 10px;
+  padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
+  background-image: linear-gradient(to bottom, #1a1a1a, #121212);
 }
 .game-container {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  gap: 10px;
+  align-items: stretch;
   filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.7));
   max-width: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
 }
 #tetris-container {
   display: flex;
   flex-direction: column;
   position: relative;
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
 }
 #tetris-container::before {
   content: "";
@@ -35,14 +43,14 @@ body {
 }
 #preview-area {
   width: 200px;
-  height: 80px;
+  height: 60px;
   display: grid;
   grid-template-columns: repeat(10, 20px);
-  grid-template-rows: repeat(4, 20px);
-  background: rgba(0, 0, 0, 0.3);
-  border-left: 2px solid #fff;
-  border-right: 2px solid #fff;
-  border-top: 2px solid #fff;
+  grid-template-rows: repeat(4, 15px);
+  background: rgba(0, 0, 0, 0.5);
+  border-left: 2px solid rgba(255, 255, 255, 0.8);
+  border-right: 2px solid rgba(255, 255, 255, 0.8);
+  border-top: 2px solid rgba(255, 255, 255, 0.8);
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
   margin-bottom: -1px;
@@ -69,13 +77,13 @@ body {
   transform: scale(0.9);
 }
 #tetris {
-  border: 2px solid #fff;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   width: 200px;
   height: 400px;
   display: grid;
   grid-template-columns: repeat(10, 20px);
   grid-template-rows: repeat(20, 20px);
-  background: #000;
+  background: rgba(0, 0, 0, 0.7);
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
@@ -90,39 +98,41 @@ body {
 .filled {
   background: cyan;
   transition: all 0.1s ease;
+  box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.3), 0 0 2px rgba(255, 255, 255, 0.5);
 }
 /* 添加不同形状方块的颜色 */
 .l-piece {
-  background: #FF8E0D;  /* 橙色 */
+  background: linear-gradient(135deg, #FF8E0D, #E65100);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .j-piece {
-  background: #0D47FF;  /* 蓝色 */
+  background: linear-gradient(135deg, #0D47FF, #1A237E);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .z-piece {
-  background: #FF0D72;  /* 红色 */
+  background: linear-gradient(135deg, #FF0D72, #C2185B);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .s-piece {
-  background: #72FF0D;  /* 绿色 */
+  background: linear-gradient(135deg, #72FF0D, #33691E);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .t-piece {
-  background: #9B0DFF;  /* 紫色 */
+  background: linear-gradient(135deg, #9B0DFF, #6A1B9A);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .o-piece {
-  background: #FFD800;  /* 黄色 */
+  background: linear-gradient(135deg, #FFD800, #FFA000);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 .i-piece {
-  background: #0DFFDD;  /* 青色 */
+  background: linear-gradient(135deg, #0DFFDD, #00ACC1);
   box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
 }
 /* 添加幽灵方块样式 */
 .ghost {
-  opacity: 0.3;
+  opacity: 0.25;
+  border: 1px dashed rgba(255, 255, 255, 0.5);
 }
 .ghost.l-piece {
   background: #FF8E0D;
@@ -148,56 +158,70 @@ body {
 .game-info {
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 20px;
+  gap: 10px;
+  background: rgba(30, 30, 30, 0.7);
+  padding: 15px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(5px);
+  min-width: 200px;
 }
 #score {
   font-size: 16px;
   text-align: center;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-  padding: 8px;
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-  margin-bottom: 10px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  margin-bottom: 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 #next-piece {
-  border: 2px solid #fff;
+  border: 2px solid rgba(255, 255, 255, 0.8);
   width: 100px;
   height: 100px;
   display: grid;
   grid-template-columns: repeat(5, 20px);
   grid-template-rows: repeat(5, 20px);
   background: rgba(0, 0, 0, 0.5);
-  border-radius: 5px;
+  border-radius: 6px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  position: relative;
 }
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 button {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 10px;
+  font-size: 15px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  background: #4CAF50;
+  background: linear-gradient(to bottom, #4CAF50, #3e8e41);
   color: white;
-  transition: background 0.3s;
+  transition: all 0.2s;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 button:hover {
-  background: #45a049;
+  background: linear-gradient(to bottom, #45a049, #357a38);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.2);
 }
 button:disabled {
-  background: #cccccc;
+  background: linear-gradient(to bottom, #cccccc, #b3b3b3);
   cursor: not-allowed;
+  box-shadow: none;
 }
 .instructions {
   margin-top: 20px;
@@ -226,18 +250,20 @@ button:disabled {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 8px;
   width: 100%;
-  max-width: 300px;
+  max-width: 350px;
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
+  background-color: rgba(20, 20, 20, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .mobile-side {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .left-side {
@@ -256,31 +282,33 @@ button:disabled {
 
 .control-group {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 /* 方向按钮 */
 .direction-btn {
-  width: 60px;
-  height: 60px;
+  width: 55px;
+  height: 55px;
   font-size: 24px;
-  background-color: #4CAF50;
-  border-radius: 10px;
+  background: linear-gradient(to bottom, #4CAF50, #3e8e41);
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* 功能按钮 */
 .action-btn {
-  width: 60px;
-  height: 60px;
+  width: 55px;
+  height: 55px;
   font-size: 18px;
-  background-color: #2196F3;
-  border-radius: 10px;
+  background: linear-gradient(to bottom, #2196F3, #1976D2);
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* 下落按钮特殊样式 */
 #drop-btn {
-  width: 120px;
-  background-color: #F44336;
+  width: 110px;
+  background: linear-gradient(to bottom, #F44336, #D32F2F);
 }
 
 /* 触摸按钮基本样式 */
@@ -297,13 +325,14 @@ button:disabled {
   position: relative;
   -webkit-tap-highlight-color: transparent;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  transition: transform 0.1s, background-color 0.1s;
+  transition: all 0.15s;
 }
 
 /* 按钮图标样式 */
 .btn-icon {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: bold;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* 按钮标签样式 */
@@ -320,15 +349,15 @@ button:disabled {
 }
 
 .direction-btn:active {
-  background-color: #388E3C;
+  background: linear-gradient(to bottom, #388E3C, #2E7D32);
 }
 
 .action-btn:active {
-  background-color: #1976D2;
+  background: linear-gradient(to bottom, #1976D2, #1565C0);
 }
 
 #drop-btn:active {
-  background-color: #D32F2F;
+  background: linear-gradient(to bottom, #D32F2F, #C62828);
 }
 
 /* 响应式设计 */
@@ -345,9 +374,9 @@ button:disabled {
   .game-container {
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     max-width: 100%;
-    padding-bottom: 10px;
+    padding: 10px;
   }
   
   .mobile-controls {
@@ -366,33 +395,33 @@ button:disabled {
   
   #tetris {
     width: 220px;
-    height: 320px;
+    height: 340px;
     grid-template-columns: repeat(10, 22px);
-    grid-template-rows: repeat(20, 16px);
+    grid-template-rows: repeat(20, 17px);
   }
   
   #preview-area {
     width: 220px;
-    height: 48px;
+    height: 44px;
     grid-template-columns: repeat(10, 22px);
-    grid-template-rows: repeat(3, 16px);
+    grid-template-rows: repeat(3, 15px);
   }
   
   .cell {
     width: 22px;
-    height: 16px;
+    height: 17px;
     border-width: 1px;
   }
   
   #preview-area .cell {
-    height: 16px;
+    height: 15px;
   }
   
   .game-info {
     width: calc(100% - 20px);
     max-width: 220px;
     padding: 10px;
-    gap: 8px;
+    gap: 6px;
     margin-top: 0;
   }
   
@@ -417,15 +446,16 @@ button:disabled {
   }
   
   .controls button {
-    padding: 6px 10px;
+    padding: 8px;
     font-size: 13px;
     flex: 1;
     min-width: 60px;
   }
   
   #score {
-    font-size: 18px;
+    font-size: 14px;
     margin: 0;
+    padding: 8px;
   }
   
   /* 移动端控制按钮样式 */
@@ -467,6 +497,11 @@ button:disabled {
   
   .difficulty-btn {
     padding: 6px 8px;
+    font-size: 12px;
+  }
+  
+  .special-btn {
+    padding: 6px 10px;
     font-size: 12px;
   }
 }
@@ -512,6 +547,11 @@ button:disabled {
   .mobile-controls {
     padding: 5px;
   }
+  
+  .special-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
 }
 
 @media screen and (min-width: 769px) {
@@ -525,16 +565,17 @@ button:disabled {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  padding-top: 10px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 8px;
   width: 100%;
 }
 
 .difficulty-label {
-  font-size: 16px;
+  font-size: 14px;
   color: #fff;
   margin-bottom: 5px;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.8);
 }
 
 .difficulty-options {
@@ -545,33 +586,107 @@ button:disabled {
 
 .difficulty-btn {
   flex: 1;
-  padding: 8px 10px;
-  background-color: #555;
+  padding: 8px 5px;
+  background: linear-gradient(to bottom, #555, #444);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .difficulty-btn:hover {
-  background-color: #666;
+  background: linear-gradient(to bottom, #666, #555);
 }
 
 .difficulty-btn.active {
-  background-color: #4CAF50;
+  background: linear-gradient(to bottom, #4CAF50, #3e8e41);
   font-weight: bold;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
 }
 
 .difficulty-btn.active:hover {
-  background-color: #45a049;
+  background: linear-gradient(to bottom, #45a049, #357a38);
 }
 
 #hard-btn.active {
-  background-color: #F44336;
+  background: linear-gradient(to bottom, #F44336, #d32f2f);
+  box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
 }
 
 #hard-btn.active:hover {
-  background-color: #d32f2f;
+  background: linear-gradient(to bottom, #e53935, #c62828);
+}
+
+.special-btn {
+  padding: 8px 12px;
+  margin-top: 8px;
+  background: linear-gradient(to bottom, #607D8B, #455A64);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.special-btn:hover {
+  background: linear-gradient(to bottom, #546E7A, #37474F);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+}
+
+.special-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 整体布局调整 */
+h3 {
+  margin: 5px 0;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* 游戏主体容器美化 */
+#tetris::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+/* 按钮焦点效果 */
+button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* 下一个方块区域美化 */
+#next-piece::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 6px;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+/* 下一个方块容器样式 */
+.next-piece-container {
+  margin-bottom: 8px;
+  text-align: center;
 } 

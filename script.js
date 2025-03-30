@@ -21,6 +21,7 @@ let nextPieceCells = [];
 let score = 0;
 let lineCount = 0;
 let level = 1;
+let highScore = 0; // 历史最高分记录
 let timerId = null;
 let isGameOver = false;
 let isPaused = false;
@@ -77,6 +78,16 @@ function initializeControls() {
     setDifficulty('hard');
     updateDifficultyButtons();
   });
+  
+  // 重置最高分按钮
+  const resetHighScoreBtn = document.getElementById('reset-highscore-btn');
+  if (resetHighScoreBtn) {
+    resetHighScoreBtn.addEventListener('click', function() {
+      if (confirm("确定要重置历史最高分记录吗？")) {
+        resetHighScore();
+      }
+    });
+  }
   
   // 更新难度按钮初始状态
   updateDifficultyButtons();
@@ -619,9 +630,19 @@ function gameOver() {
   // 清除预览区域
   clearPreviewArea();
   
+  // 检查是否创造了新的最高分记录
+  const isNewHighScore = checkHighScore();
+  
   // 游戏结束提示
-  alert(`游戏结束！\n最终得分：${score}\n消除行数：${lineCount}\n达到等级：${level}`);
-  console.log(`游戏结束 - 得分:${score}, 行数:${lineCount}, 等级:${level}`);
+  let gameOverMessage = `游戏结束！\n最终得分：${score}\n消除行数：${lineCount}\n达到等级：${level}`;
+  if (isNewHighScore) {
+    gameOverMessage += `\n\n恭喜您创造了新的最高分记录！`;
+  } else {
+    gameOverMessage += `\n\n历史最高分：${highScore}`;
+  }
+  
+  alert(gameOverMessage);
+  console.log(`游戏结束 - 得分:${score}, 行数:${lineCount}, 等级:${level}, 历史最高分:${highScore}`);
 }
 
 // 键盘控制
@@ -831,6 +852,8 @@ window.addEventListener('load', function() {
   isMobileDevice = checkMobileDevice();
   // 初始化所有控制
   initializeControls();
+  // 加载历史最高分
+  loadHighScore();
   // 绘制初始方块
   draw();
   console.log("游戏完全加载并初始化完成");
@@ -875,7 +898,7 @@ function resetGame() {
   restartBtn.disabled = true;
   startBtn.disabled = false;
   
-  // 重置游戏状态
+  // 重置游戏状态 (保留highScore)
   score = 0;
   lineCount = 0;
   level = 1;
@@ -905,7 +928,7 @@ function resetGame() {
   // 重新绘制
   draw();
   displayNextPiece();
-  console.log('游戏重置');
+  console.log('游戏重置，当前最高分:', highScore);
 }
 
 // 初次绘制
@@ -960,5 +983,34 @@ function updateDifficultyButtons() {
 
 // 更新分数显示
 function updateScore() {
-  scoreDisplay.innerHTML = `分数: ${score} | 行数: ${lineCount} | 等级: ${level}`;
+  scoreDisplay.innerHTML = `分数: ${score} | 最高分: ${highScore} | 行数: ${lineCount} | 等级: ${level}`;
+}
+
+// 从localStorage加载历史最高分
+function loadHighScore() {
+  const savedHighScore = localStorage.getItem('tetrisHighScore');
+  if (savedHighScore !== null) {
+    highScore = parseInt(savedHighScore);
+    console.log('加载历史最高分:', highScore);
+  }
+  updateScore(); // 更新显示
+}
+
+// 检查并更新最高分
+function checkHighScore() {
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem('tetrisHighScore', highScore);
+    console.log('新的最高分记录:', highScore);
+    return true;
+  }
+  return false;
+}
+
+// 重置最高分
+function resetHighScore() {
+  highScore = 0;
+  localStorage.removeItem('tetrisHighScore');
+  updateScore();
+  console.log('最高分已重置');
 } 
